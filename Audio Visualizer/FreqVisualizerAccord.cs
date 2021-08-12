@@ -1,8 +1,8 @@
-﻿using Love;
+﻿using Accord.Math;
+using Love;
 using NAudio.Wave;
 using System;
 using System.Numerics;
-using Accord.Math;
 
 namespace AudioVisualizer
 {

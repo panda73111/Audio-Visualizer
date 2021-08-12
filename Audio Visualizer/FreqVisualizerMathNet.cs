@@ -1,9 +1,9 @@
 ﻿using Love;
+using MathNet.Numerics.IntegralTransforms;
 using NAudio.Wave;
 using System;
-using System.Numerics;
-using MathNet.Numerics.IntegralTransforms;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace AudioVisualizer
 {

@@ -1,6 +1,6 @@
-﻿using System;
-using Love;
+﻿using Love;
 using NAudio.Wave;
+using System;
 
 namespace AudioVisualizer
 {
@@ -70,7 +70,8 @@ namespace AudioVisualizer
                 Zoom -= 1;
                 Graphics.Print("An error occured, please wait");
                 return;
-            } else if (Zoom <= 0)
+            }
+            else if (Zoom <= 0)
                 Graphics.Print("Zoom is invalid");
 
             int pad = len / WindowWidth; // samples per pixels

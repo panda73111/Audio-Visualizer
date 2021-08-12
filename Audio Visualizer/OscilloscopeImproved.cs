@@ -1,6 +1,6 @@
-﻿using System;
-using Love;
+﻿using Love;
 using NAudio.Wave;
+using System;
 
 namespace AudioVisualizer
 {
