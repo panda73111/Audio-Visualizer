@@ -9,7 +9,7 @@ namespace AudioVisualizer
     /*
      * Visualizer using frequencies
      */
-    class FreqVisualizerAccord : VisualizerWindow
+    class FreqVisualizerAccord : Scene
     {
         private WaveBuffer buffer;
 
@@ -19,7 +19,7 @@ namespace AudioVisualizer
 
         public override void Load()
         {
-            WindowTitle = "Frequency Visualizer";
+            Window.SetTitle("Frequency Visualizer");
             base.Load();
 
             // start audio capture
@@ -50,9 +50,11 @@ namespace AudioVisualizer
             }
 
             int len = buffer.FloatBuffer.Length / 8;
-            float pad = (float)len / WindowWidth; // samples per pixels
+            int windowWidth = Graphics.GetWidth();
+            int windowHeight = Graphics.GetHeight();
+            float pad = (float)len / windowWidth; // samples per pixels
 
-            for (int x = 0; x < WindowWidth; x++)
+            for (int x = 0; x < windowWidth; x++)
             {
                 // current sample
                 int i = (int)Math.Round(x * pad);
@@ -65,7 +67,7 @@ namespace AudioVisualizer
 
                 // render
                 Graphics.SetColor(Math.Abs(y), 1f - Math.Abs(y), Math.Abs(y), 1f);
-                Graphics.Line(x1, WindowHeight / 2 + y1 * (WindowHeight / (Intensity * 2)), x, WindowHeight / 2 + y * (WindowHeight / (Intensity * 2)));
+                Graphics.Line(x1, windowHeight / 2 + y1 * (windowHeight / (Intensity * 2)), x, windowHeight / 2 + y * (windowHeight / (Intensity * 2)));
             }
 
             // fft
@@ -79,7 +81,7 @@ namespace AudioVisualizer
                 float v = (float)(values[i].Magnitude);
                 //Graphics.Print(v.ToString(), 0, (i + 1) * 16);
                 Graphics.SetColor(Math.Abs(v), 1f - Math.Abs(v), 1f - Math.Abs(v), 1f);
-                Graphics.Rectangle(DrawMode.Fill, i * 16, WindowHeight, 16, -v * 10 * WindowHeight - 1);
+                Graphics.Rectangle(DrawMode.Fill, i * 16, windowHeight, 16, -v * 10 * windowHeight - 1);
 
                 /*int j = Math.Max(i - 1, 0);
                 float w = (float)(values[j].Magnitude);

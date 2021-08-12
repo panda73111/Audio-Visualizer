@@ -4,7 +4,7 @@ namespace AudioVisualizer
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             Boot.Run(new FreqVisualizerMathNet());
         }

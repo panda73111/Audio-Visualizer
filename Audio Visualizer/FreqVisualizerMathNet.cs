@@ -21,11 +21,11 @@ namespace AudioVisualizer
     {
         private WaveBuffer buffer;
 
-        private float size = 10;
+        private static float size = 10;
 
         private Complex[] values;
 
-        private readonly double count = 64;
+        private readonly double count = 100;
 
         public override void Load()
         {

@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Audio_Visualizer</RootNamespace>
     <Configurations>Debug;Release;Mac</Configurations>
+    <StartupObject>AudioVisualizer.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
