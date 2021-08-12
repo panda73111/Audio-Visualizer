@@ -25,8 +25,6 @@ namespace AudioVisualizer
         private static int horizontal_smoothness = 1;
         private float size = 10;
 
-        private int vis_mode = 0;
-
         private static SmoothType smoothType = SmoothType.both;
 
         private List<Complex[]> smooth = new List<Complex[]>();
@@ -110,36 +108,6 @@ namespace AudioVisualizer
                 case KeyConstant.B:
                     smoothType = SmoothType.both;
                     break;
-                case KeyConstant.Number1:
-                    vis_mode = 0;
-                    break;
-                case KeyConstant.Number2:
-                    vis_mode = 1;
-                    break;
-                case KeyConstant.Number3:
-                    vis_mode = 2;
-                    break;
-                case KeyConstant.Number4:
-                    vis_mode = 3;
-                    break;
-                case KeyConstant.Number5:
-                    vis_mode = 4;
-                    break;
-                case KeyConstant.Number6:
-                    vis_mode = 5;
-                    break;
-                case KeyConstant.Number7:
-                    vis_mode = 6;
-                    break;
-                case KeyConstant.Number8:
-                    vis_mode = 7;
-                    break;
-                case KeyConstant.Number9:
-                    vis_mode = 8;
-                    break;
-                case KeyConstant.Number0:
-                    vis_mode = 9;
-                    break;
             }
         }
 
@@ -177,7 +145,8 @@ namespace AudioVisualizer
 
         public double hSmooth(int i)
         {
-            if (i > 1) {
+            if (i > 1)
+            {
                 double value = values[i].Magnitude;
 
                 for (int h = i - horizontal_smoothness; h <= i + horizontal_smoothness; h++)
@@ -192,80 +161,16 @@ namespace AudioVisualizer
         private void DrawVis(int i, double c, float size, double value)
         {
             float pre_x = 0, pre_y = 0, x = 0, y = 0;
-
-            if (vis_mode == 2 || vis_mode == 3 || vis_mode == 4)
-            {
-                value *= 100;
-
-                double n = c / (Math.PI * 2);
-                double j = (i - 1) / n;
-                pre_x = (float)(Math.Cos(j) * pre_value) + WindowWidth / 2;
-                pre_y = (float)(Math.Sin(j) * pre_value) + WindowHeight / 2;
-
-                j = i / n;
-                x = (float)(Math.Cos(j) * value) + WindowWidth / 2;
-                y = (float)(Math.Sin(j) * value) + WindowHeight / 2;
-            }
-            else if (vis_mode == 6)
-            {
-                value *= 10;
-
-                double n = c / Math.PI;
-                double j = i / n + Math.PI / 2;
-
-                pre_x = (float)(Math.Cos(j) * pre_value) * 10;
-                pre_y = (float)(Math.Sin(j) * pre_value) * -10 + WindowHeight / 2;
-
-                j = (i + 1) / n + Math.PI / 2;
-                x = (float)(Math.Cos(j) * value) * 10;
-                y = (float)(Math.Sin(j) * value) * -10 + WindowHeight / 2;
-            }
-            else
-            {
-                value *= WindowHeight / 2;
-            }
+            value *= WindowHeight / 2;
 
             value += BothSmooth(i - 1) + BothSmooth(i + 1);
             value /= 3;
 
-            switch (vis_mode)
+            for (float l = 0; l < value; l++)
             {
-                case 1:
-                    Graphics.Line(i * size - size / 2, (float)(WindowHeight - pre_value), (i + 1) * size - size / 2, (float)(WindowHeight - value));
-                    break;
-                case 2:
-                    Graphics.Circle(DrawMode.Fill, x, y, 1);
-                    break;
-                case 3:
-                    Graphics.Line(pre_x, pre_y, x, y);
-                    break;
-                case 4:
-                    Graphics.SetColor((float)value / 255, (float)value / 255, (float)value / 255);
-                    Graphics.Polygon(DrawMode.Fill, pre_x, pre_y, x, y, WindowWidth / 2, WindowHeight / 2);
-                    break;
-                case 5:
-                    Graphics.SetColor(1f - i / 64f, i / 64f, 0, 1);
-                    Graphics.Arc(DrawMode.Fill, WindowWidth / 2, WindowHeight / 2, 256, 0, (float)value / 255);
-                    break;
-                case 6:
-                    Graphics.Line(pre_x + WindowWidth / 2, pre_y, x + WindowWidth / 2, y);
-                    Graphics.Line(-pre_x + WindowWidth / 2, pre_y, -x + WindowWidth / 2, y);
-                    break;
-                case 7:
-                    for (float l = 0; l < value + size * 0.75f; l += size * 0.75f)
-                        Graphics.Rectangle(DrawMode.Fill, i * size, WindowHeight - l, size * 0.95f, size / 2);
-                    break;
-                case 8:
-                    for (float l = 0; l < value; l++)
-                    {
-                        float u = l / WindowHeight;
-                        Graphics.SetColor(u, 1-u, 0);
-                        Graphics.Line(i * size, WindowHeight - l, (i + 1) * size, WindowHeight - l);
-                    }
-                    break;
-                default:
-                    Graphics.Rectangle(DrawMode.Fill, i * size, WindowHeight, size, (float)-value);
-                    break;
+                float u = l / WindowHeight;
+                Graphics.SetColor(u, 1 - u, 0);
+                Graphics.Line(i * size, WindowHeight - l, (i + 1) * size, WindowHeight - l);
             }
             pre_value = value;
         }
