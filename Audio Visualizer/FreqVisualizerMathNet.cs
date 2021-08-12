@@ -17,7 +17,7 @@ namespace AudioVisualizer
     /*
      * Visualizer using frequencies
      */
-    class FreqVisualizerMathNet : VisualizerWindow
+    class FreqVisualizerMathNet : Scene
     {
         private WaveBuffer buffer;
 
@@ -25,11 +25,11 @@ namespace AudioVisualizer
 
         private Complex[] values;
 
-        private double count = 64;
+        private readonly double count = 64;
 
         public override void Load()
         {
-            WindowTitle = "Frequency Visualizer";
+            Window.SetTitle("Frequency Visualizer");
             base.Load();
 
             // start audio capture
@@ -51,7 +51,7 @@ namespace AudioVisualizer
 
             int len = buffer.FloatBuffer.Length / 8;
 
-            // fft
+            // FFT
             values = new Complex[len];
             for (int i = 0; i < len; i++)
                 values[i] = new Complex(buffer.FloatBuffer[i], 0.0);
@@ -60,16 +60,16 @@ namespace AudioVisualizer
 
         private void DrawVis(int i, float size, double value)
         {
-            value *= WindowHeight / 2;
+            float windowHeight = Graphics.GetHeight();
+            value *= windowHeight / 2;
 
-            value += 1;
             value /= 3;
 
             for (float l = 0; l < value; l++)
             {
-                float u = l / WindowHeight;
+                float u = l / windowHeight;
                 Graphics.SetColor(u, 1 - u, 0);
-                Graphics.Line(i * size, WindowHeight - l, (i + 1) * size, WindowHeight - l);
+                Graphics.Line(i * size, windowHeight - l, (i + 1) * size, windowHeight - l);
             }
         }
 
@@ -82,12 +82,18 @@ namespace AudioVisualizer
                 return;
             }
 
-            size = WindowWidth / 64;
+            size = Graphics.GetHeight() / 64;
 
             for (int i = 0; i < count; i++)
             {
                 DrawVis(i, size, values[i].Magnitude);
             }
+        }
+
+        public override void KeyPressed(KeyConstant key, Scancode scancode, bool isRepeat)
+        {
+            if (key == KeyConstant.F) Window.SetFullscreen(!Window.GetFullscreen());
+            if (key == KeyConstant.Escape) Event.Quit();
         }
     }
 }
