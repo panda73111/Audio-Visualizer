@@ -1,8 +1,6 @@
 ﻿using Love;
 using MathNet.Numerics.IntegralTransforms;
 using NAudio.Wave;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace AudioVisualizer
@@ -21,11 +19,11 @@ namespace AudioVisualizer
     {
         private WaveBuffer buffer;
 
-        private static float size = 10;
+        private static int size = 10;
 
         private Complex[] values;
 
-        private readonly double count = 100;
+        private readonly int count = 150;
 
         public override void Load()
         {
@@ -60,7 +58,7 @@ namespace AudioVisualizer
 
         private void DrawVis(int i, float size, double value)
         {
-            float windowHeight = Graphics.GetHeight();
+            int windowHeight = Graphics.GetHeight();
             value *= windowHeight / 2;
 
             value /= 3;
@@ -82,7 +80,7 @@ namespace AudioVisualizer
                 return;
             }
 
-            size = Graphics.GetHeight() / 64;
+            size = Graphics.GetWidth() / count;
 
             for (int i = 0; i < count; i++)
             {

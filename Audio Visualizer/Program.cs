@@ -6,7 +6,8 @@ namespace AudioVisualizer
     {
         static void Main()
         {
-            Boot.Run(new FreqVisualizerMathNet());
+            BootConfig config = new BootConfig() { WindowResizable = true };
+            Boot.Run(new FreqVisualizerMathNet(), config);
         }
     }
 }
