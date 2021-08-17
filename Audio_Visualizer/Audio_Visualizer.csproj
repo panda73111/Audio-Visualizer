@@ -5,11 +5,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Audio_Visualizer</RootNamespace>
     <Configurations>Debug;Release;Mac</Configurations>
-    <StartupObject>AudioVisualizer.Program</StartupObject>
+    <StartupObject>Audio_Visualizer.Program</StartupObject>
     <ApplicationIcon />
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>3</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 

@@ -1,6 +1,6 @@
 ﻿using Love;
 
-namespace AudioVisualizer
+namespace Audio_Visualizer
 {
     class Program
     {

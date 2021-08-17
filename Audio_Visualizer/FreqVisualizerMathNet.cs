@@ -3,7 +3,7 @@ using MathNet.Numerics.IntegralTransforms;
 using NAudio.Wave;
 using System.Numerics;
 
-namespace AudioVisualizer
+namespace Audio_Visualizer
 {
     enum SmoothType
     {
@@ -17,13 +17,14 @@ namespace AudioVisualizer
      */
     class FreqVisualizerMathNet : Scene
     {
-        private WaveBuffer buffer;
+        private WaveBuffer _buffer;
 
-        private static int size = 10;
+        private Complex[] _values;
+        private VolumeLevel[] _levels;
 
-        private Complex[] values;
+        private const int Count = 150;
 
-        private readonly int count = 150;
+        private enum VolumeLevel { Low, Middle, High };
 
         public override void Load()
         {
@@ -45,20 +46,21 @@ namespace AudioVisualizer
 
         public void DataAvailable(object sender, WaveInEventArgs e)
         {
-            buffer = new WaveBuffer(e.Buffer); // save the buffer in the class variable
+            _buffer = new WaveBuffer(e.Buffer); // save the buffer in the class variable
 
-            int len = buffer.FloatBuffer.Length / 8;
+            int len = _buffer.FloatBuffer.Length / 8;
 
             // FFT
-            values = new Complex[len];
+            _values = new Complex[len];
             for (int i = 0; i < len; i++)
-                values[i] = new Complex(buffer.FloatBuffer[i], 0.0);
-            Fourier.Forward(values, FourierOptions.Default);
+                _values[i] = new Complex(_buffer.FloatBuffer[i], 0.0);
+            Fourier.Forward(_values, FourierOptions.Default);
         }
 
-        private void DrawVis(int i, float size, double value)
+        private void DrawVis(int i, double value)
         {
             int windowHeight = Graphics.GetHeight();
+            float barWidth = Graphics.GetWidth() / Count + 0.5f;
             value *= windowHeight / 2;
 
             value /= 3;
@@ -67,24 +69,22 @@ namespace AudioVisualizer
             {
                 float u = l / windowHeight;
                 Graphics.SetColor(u, 1 - u, 0);
-                Graphics.Line(i * size, windowHeight - l, (i + 1) * size, windowHeight - l);
+                Graphics.Line(i * barWidth, windowHeight - l, (i + 1) * barWidth, windowHeight - l);
             }
         }
 
         public override void Draw()
         {
             Graphics.SetColor(1, 1, 1);
-            if (buffer == null)
+            if (_buffer == null)
             {
                 Graphics.Print("No buffer available");
                 return;
             }
 
-            size = Graphics.GetWidth() / count;
-
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < Count; i++)
             {
-                DrawVis(i, size, values[i].Magnitude);
+                DrawVis(i, _values[i].Magnitude);
             }
         }
 
