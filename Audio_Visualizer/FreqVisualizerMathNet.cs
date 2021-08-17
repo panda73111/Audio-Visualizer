@@ -5,13 +5,6 @@ using System.Numerics;
 
 namespace Audio_Visualizer
 {
-    enum SmoothType
-    {
-        horizontal,
-        vertical,
-        both
-    }
-
     /*
      * Visualizer using frequencies
      */
@@ -20,11 +13,10 @@ namespace Audio_Visualizer
         private WaveBuffer _buffer;
 
         private Complex[] _values;
-        private VolumeLevel[] _levels;
 
         private const int Count = 150;
 
-        private enum VolumeLevel { Low, Middle, High };
+        private enum VolumeLevel { Low, Middle, High }
 
         public override void Load()
         {
@@ -57,20 +49,42 @@ namespace Audio_Visualizer
             Fourier.Forward(_values, FourierOptions.Default);
         }
 
-        private void DrawVis(int i, double value)
+        private static void DrawVis(int i, double value)
         {
             int windowHeight = Graphics.GetHeight();
-            float barWidth = Graphics.GetWidth() / Count + 0.5f;
-            value *= windowHeight / 2;
+            double middleLevelMinimum = windowHeight / 3d;
+            double highLevelMinimum = 2 * middleLevelMinimum;
+            float barWidth = Graphics.GetWidth() / (Count + 0.5f);
+            value *= windowHeight / 2d;
 
             value /= 3;
 
-            for (float l = 0; l < value; l++)
+            for (float l = 2 * barWidth; l < value; l++)
             {
                 float u = l / windowHeight;
                 Graphics.SetColor(u, 1 - u, 0);
                 Graphics.Line(i * barWidth, windowHeight - l, (i + 1) * barWidth, windowHeight - l);
             }
+
+            VolumeLevel level = VolumeLevel.Low;
+            if (value > highLevelMinimum)
+                level = VolumeLevel.High;
+            else if (value > middleLevelMinimum)
+                level = VolumeLevel.Middle;
+
+            switch (level)
+            {
+                case VolumeLevel.Low:
+                    Graphics.SetColor(Color.Green);
+                    break;
+                case VolumeLevel.Middle:
+                    Graphics.SetColor(Color.Yellow);
+                    break;
+                case VolumeLevel.High:
+                    Graphics.SetColor(Color.Red);
+                    break;
+            }
+            Graphics.Circle(DrawMode.Fill, new Love.Vector2((i + 0.5f) * barWidth, windowHeight - barWidth), barWidth / 2f);
         }
 
         public override void Draw()
