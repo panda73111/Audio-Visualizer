@@ -20,7 +20,7 @@ namespace Audio_Visualizer
         private const int Count = 150;
 
         private const int BaudRate = 2000000;
-
+		
         private enum VolumeLevel : byte { Low, Middle, High }
 
         private SerialPort _port;
@@ -43,8 +43,9 @@ namespace Audio_Visualizer
 
             string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             if (ports.Any())
-            {
+			{
                 _port = new SerialPort(ports.Last(), BaudRate, Parity.Even);
+                _port = new SerialPort(ports.Last(), 115200, Parity.Even);
                 _port.Open();
             }
 
