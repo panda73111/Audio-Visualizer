@@ -1,6 +1,9 @@
-﻿using Love;
+﻿using System;
+using Love;
 using MathNet.Numerics.IntegralTransforms;
 using NAudio.Wave;
+using System.IO.Ports;
+using System.Linq;
 using System.Numerics;
 
 namespace Audio_Visualizer
@@ -8,7 +11,7 @@ namespace Audio_Visualizer
     /*
      * Visualizer using frequencies
      */
-    class FreqVisualizerMathNet : Scene
+    internal class FreqVisualizerMathNet : Scene
     {
         private WaveBuffer _buffer;
 
@@ -16,7 +19,12 @@ namespace Audio_Visualizer
 
         private const int Count = 150;
 
-        private enum VolumeLevel { Low, Middle, High }
+        private const int BaudRate = 2000000;
+
+        private enum VolumeLevel : byte { Low, Middle, High }
+
+        private SerialPort _port;
+        private static readonly byte[] buffer = new byte[1];
 
         public override void Load()
         {
@@ -32,6 +40,13 @@ namespace Audio_Visualizer
             {
                 capture.Dispose();
             };
+
+            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
+            if (ports.Any())
+            {
+                _port = new SerialPort(ports.Last(), BaudRate, Parity.Even);
+                _port.Open();
+            }
 
             capture.StartRecording();
         }
@@ -49,7 +64,7 @@ namespace Audio_Visualizer
             Fourier.Forward(_values, FourierOptions.Default);
         }
 
-        private static void DrawVis(int i, double value)
+        private static void DrawVis(int i, double value, SerialPort port = null)
         {
             int windowHeight = Graphics.GetHeight();
             double middleLevelMinimum = windowHeight / 3d;
@@ -66,24 +81,32 @@ namespace Audio_Visualizer
                 Graphics.Line(i * barWidth, windowHeight - l, (i + 1) * barWidth, windowHeight - l);
             }
 
-            VolumeLevel level = VolumeLevel.Low;
-            if (value > highLevelMinimum)
-                level = VolumeLevel.High;
-            else if (value > middleLevelMinimum)
-                level = VolumeLevel.Middle;
-
-            switch (level)
+            if (port != null)
             {
-                case VolumeLevel.Low:
-                    Graphics.SetColor(Color.Green);
-                    break;
-                case VolumeLevel.Middle:
-                    Graphics.SetColor(Color.Yellow);
-                    break;
-                case VolumeLevel.High:
-                    Graphics.SetColor(Color.Red);
-                    break;
+                VolumeLevel level = (byte)VolumeLevel.Low;
+                if (value > highLevelMinimum)
+                    level = VolumeLevel.High;
+                else if (value > middleLevelMinimum)
+                    level = VolumeLevel.Middle;
+
+                buffer[0] = (byte)level;
+                port.Write(buffer, 0, 1);
+                switch (level)
+                {
+                    case VolumeLevel.Low:
+                        Graphics.SetColor(Color.Green);
+                        break;
+                    case VolumeLevel.Middle:
+                        Graphics.SetColor(Color.Yellow);
+                        break;
+                    case VolumeLevel.High:
+                        Graphics.SetColor(Color.Red);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
+
             Graphics.Circle(DrawMode.Fill, new Love.Vector2((i + 0.5f) * barWidth, windowHeight - barWidth), barWidth / 2f);
         }
 
@@ -98,7 +121,7 @@ namespace Audio_Visualizer
 
             for (int i = 0; i < Count; i++)
             {
-                DrawVis(i, _values[i].Magnitude);
+                DrawVis(i, _values[i].Magnitude, _port);
             }
         }
 
