@@ -17,14 +17,14 @@ namespace Audio_Visualizer
 
         private Complex[] _values;
 
-        private const int Count = 150;
+        private const int Count = 211;
 
         private const int BaudRate = 2000000;
-		
+
         private enum VolumeLevel : byte { Low, Middle, High }
 
         private SerialPort _port;
-        private static readonly byte[] buffer = new byte[1];
+        private static readonly byte[] Buffer = new byte[Count];
 
         public override void Load()
         {
@@ -43,9 +43,8 @@ namespace Audio_Visualizer
 
             string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             if (ports.Any())
-			{
+            {
                 _port = new SerialPort(ports.Last(), BaudRate, Parity.Even);
-                _port = new SerialPort(ports.Last(), 115200, Parity.Even);
                 _port.Open();
             }
 
@@ -68,8 +67,8 @@ namespace Audio_Visualizer
         private static void DrawVis(int i, double value, SerialPort port = null)
         {
             int windowHeight = Graphics.GetHeight();
-            double middleLevelMinimum = windowHeight / 3d;
-            double highLevelMinimum = 2 * middleLevelMinimum;
+            double middleLevelMinimum = windowHeight / 50d;
+            double highLevelMinimum = 25 * middleLevelMinimum;
             float barWidth = Graphics.GetWidth() / (Count + 0.5f);
             value *= windowHeight / 2d;
 
@@ -82,30 +81,31 @@ namespace Audio_Visualizer
                 Graphics.Line(i * barWidth, windowHeight - l, (i + 1) * barWidth, windowHeight - l);
             }
 
+            VolumeLevel level = (byte)VolumeLevel.Low;
+            if (value > highLevelMinimum)
+                level = VolumeLevel.High;
+            else if (value > middleLevelMinimum)
+                level = VolumeLevel.Middle;
+
             if (port != null)
             {
-                VolumeLevel level = (byte)VolumeLevel.Low;
-                if (value > highLevelMinimum)
-                    level = VolumeLevel.High;
-                else if (value > middleLevelMinimum)
-                    level = VolumeLevel.Middle;
+                Buffer[i] = (byte)level;
+                port.Write(Buffer, 0, Count);
+            }
 
-                buffer[0] = (byte)level;
-                port.Write(buffer, 0, 1);
-                switch (level)
-                {
-                    case VolumeLevel.Low:
-                        Graphics.SetColor(Color.Green);
-                        break;
-                    case VolumeLevel.Middle:
-                        Graphics.SetColor(Color.Yellow);
-                        break;
-                    case VolumeLevel.High:
-                        Graphics.SetColor(Color.Red);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+            switch (level)
+            {
+                case VolumeLevel.Low:
+                    Graphics.SetColor(Color.Green);
+                    break;
+                case VolumeLevel.Middle:
+                    Graphics.SetColor(Color.Yellow);
+                    break;
+                case VolumeLevel.High:
+                    Graphics.SetColor(Color.Red);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             Graphics.Circle(DrawMode.Fill, new Love.Vector2((i + 0.5f) * barWidth, windowHeight - barWidth), barWidth / 2f);
