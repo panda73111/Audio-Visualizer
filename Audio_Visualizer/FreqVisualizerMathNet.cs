@@ -41,7 +41,7 @@ namespace Audio_Visualizer
                 capture.Dispose();
             };
 
-            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
+            string[] ports = SerialPort.GetPortNames();
             if (ports.Any())
             {
                 _port = new SerialPort(ports.Last(), BaudRate, Parity.Even);
